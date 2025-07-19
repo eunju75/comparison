@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>보험료 비교</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    input, select { margin-bottom: 10px; display: block; }
+    table, th, td { border: 1px solid #999; border-collapse: collapse; padding: 8px; }
+  </style>
+</head>
+<body>
+  <h2>보험료 비교</h2>
+  <form id="compareForm">
+    <label>상품유형: <select name="productType">
+      <option value="5.10.1형">5.10.1형</option>
+      <option value="5.10.2형">5.10.2형</option>
+    </select></label>
+    <label>연령: <select name="age">
+      <option value="20">20세</option>
+      <option value="30">30세</option>
+      <option value="40">40세</option>
+      <option value="50">50세</option>
+    </select></label>
+    <label>성별: <select name="gender">
+      <option value="남">남</option>
+      <option value="여">여</option>
+    </select></label>
+    <label>암진단금(만원): <input type="number" name="암진단금" step="1000"></label>
+    <label>유사암(만원): <input type="number" name="유사암" step="200"></label>
+    <label>뇌혈관질환(만원): <input type="number" name="뇌혈관질환" step="1000"></label>
+    <label>확대심장질환(만원): <input type="number" name="확대심장질환" step="1000"></label>
+    <label>허혈성심장질환(만원): <input type="number" name="허혈성심장질환" step="1000"></label>
+    <button type="submit">비교하기</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("compareForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((v, k) => data[k] = v);
+
+      const res = await fetch("https://script.google.com/macros/s/AKfycbxO4MA1UfG8Jn0Ew0MctUf_ZPPOLnkpIzyQmB6VUu0ewTF0kWg0nrgyDlqof5_WYYBBDQ/exec", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const result = await res.json();
+      let html = "<h3>비교 결과</h3><table><tr><th>보험사</th><th>보험료(원)</th></tr>";
+      result.forEach(([name, price]) => {
+        if (name) html += `<tr><td>${name}</td><td>${price}</td></tr>`;
+      });
+      html += "</table>";
+      document.getElementById("result").innerHTML = html;
+    });
+  </script>
+</body>
+</html>
